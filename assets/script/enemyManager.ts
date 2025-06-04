@@ -26,46 +26,33 @@ export class enemyManager extends Component {
   @property
   enemy2Rate: number = 1;
 
-  enemy0timer: number = 0;
-  enemy1timer: number = 0;
-  enemy2timer: number = 0;
+  start() {
+    this.schedule(this.enemy0Spawn, this.enemy0Rate);
+    this.schedule(this.enemy1Spawn, this.enemy1Rate);
+    this.schedule(this.enemy2Spawn, this.enemy2Rate);
+  }
 
-  start() {}
+  protected onDestroy(): void {
+    this.unschedule(this.enemy0Spawn);
+    this.unschedule(this.enemy1Spawn);
+    this.unschedule(this.enemy2Spawn);
+  }
 
   update(deltaTime: number) {
-    this.enemy0timer += deltaTime;
-    if (this.enemy0timer > this.enemy0Rate) {
-      this.enemy0timer = 0;
-      this.enemy0Spawn();
-    }
-    this.enemy1timer += deltaTime;
-    if (this.enemy1timer > this.enemy1Rate) {
-      this.enemy1timer = 0;
-      this.enemy1Spawn();
-    }
-    this.enemy2timer += deltaTime;
-    if (this.enemy2timer > this.enemy2Rate) {
-      this.enemy2timer = 0;
-      this.enemy2Spawn();
-    }
+  }
+
+  enemySpawn(prefab:Prefab,x:number,y:number){
+    const enemy = poolManager.instance().getNode(prefab, this.node);
+    enemy.setPosition(math.randomRangeInt(-x,x),y);
   }
 
   enemy0Spawn() {
-    const enemy0 = poolManager.instance().getNode(this.enemy0Prefab, this.node);
-    let x = math.randomRangeInt(-215, 215);
-    let y = 475;
-    enemy0.setPosition(x, y);
+    this.enemySpawn(this.enemy0Prefab,215,475);
   }
   enemy1Spawn() {
-    const enemy1 = poolManager.instance().getNode(this.enemy1Prefab, this.node);
-    let x = math.randomRangeInt(-200, 200);
-    let y = 475;
-    enemy1.setPosition(x, y);
+    this.enemySpawn(this.enemy1Prefab,200,475);
   }
   enemy2Spawn() {
-    const enemy2 = poolManager.instance().getNode(this.enemy2Prefab, this.node);
-    let x = math.randomRangeInt(-154, 154);
-    let y = 560;
-    enemy2.setPosition(x, y);
+    this.enemySpawn(this.enemy2Prefab,154,560);
   }
 }

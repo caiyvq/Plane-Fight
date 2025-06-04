@@ -29,10 +29,16 @@
       },
       {
         "__id__": 12
+      },
+      {
+        "__id__": 14
+      },
+      {
+        "__id__": 16
       }
     ],
     "_prefab": {
-      "__id__": 14
+      "__id__": 18
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -283,6 +289,126 @@
     "fileId": "1crXWrVjBKHpWHevgsbRAU"
   },
   {
+    "__type__": "cc.PolygonCollider2D",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "__prefab": {
+      "__id__": 15
+    },
+    "tag": 0,
+    "_group": 1,
+    "_density": 1,
+    "_sensor": true,
+    "_friction": 0.2,
+    "_restitution": 0,
+    "_offset": {
+      "__type__": "cc.Vec2",
+      "x": 20.2,
+      "y": 2.4
+    },
+    "_points": [
+      {
+        "__type__": "cc.Vec2",
+        "x": -55,
+        "y": -115
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": -97,
+        "y": -70
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": -80,
+        "y": -50
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": -80,
+        "y": 113
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": -60,
+        "y": 51
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": -20,
+        "y": 50
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 18,
+        "y": 51
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 41,
+        "y": 113
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 37,
+        "y": -50
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 58,
+        "y": -70
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 16,
+        "y": -115
+      }
+    ],
+    "_id": ""
+  },
+  {
+    "__type__": "cc.CompPrefabInfo",
+    "fileId": "e637FeSH5PepCw1/BjdrDZ"
+  },
+  {
+    "__type__": "cc.RigidBody2D",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "__prefab": {
+      "__id__": 17
+    },
+    "enabledContactListener": false,
+    "bullet": false,
+    "awakeOnLoad": true,
+    "_group": 1,
+    "_type": 1,
+    "_allowSleep": true,
+    "_gravityScale": 1,
+    "_linearDamping": 0,
+    "_angularDamping": 0,
+    "_linearVelocity": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "_angularVelocity": 0,
+    "_fixedRotation": false,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.CompPrefabInfo",
+    "fileId": "5a4kvCch5GYLRX8HAuqBol"
+  },
+  {
     "__type__": "cc.PrefabInfo",
     "root": {
       "__id__": 1
@@ -291,6 +417,7 @@
       "__id__": 0
     },
     "fileId": "60CMHdgNNEHYTLorBG8020",
+    "instance": null,
     "targetOverrides": null
   }
 ]
