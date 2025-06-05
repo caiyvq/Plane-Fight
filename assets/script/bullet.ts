@@ -15,7 +15,7 @@ export class bullet extends Component {
     update(deltaTime: number) {
         const p = this.node.position;
         this.node.setPosition(p.x, p.y + this.speed * deltaTime);
-        if (this.node.position.y > 500) {
+        if (this.node.position.y > 435) {
             poolManager.instance().putNode(this.node);
         }
     }

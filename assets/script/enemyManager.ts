@@ -27,9 +27,9 @@ export class enemyManager extends Component {
   enemy2Rate: number = 1;
 
   start() {
-    this.schedule(this.enemy0Spawn, this.enemy0Rate);
+    // this.schedule(this.enemy0Spawn, this.enemy0Rate);
     this.schedule(this.enemy1Spawn, this.enemy1Rate);
-    this.schedule(this.enemy2Spawn, this.enemy2Rate);
+    // this.schedule(this.enemy2Spawn, this.enemy2Rate);
   }
 
   protected onDestroy(): void {

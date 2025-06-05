@@ -216,6 +216,10 @@
       {
         "__uuid__": "78fe2c60-4cd2-44e9-ad04-552d04f7643a",
         "__expectedType__": "cc.AnimationClip"
+      },
+      {
+        "__uuid__": "1677c565-e083-424b-93fd-9f652b7d4a81",
+        "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
@@ -282,6 +286,22 @@
       "__id__": 13
     },
     "speed": 150,
+    "lifePoint": 8,
+    "animation": {
+      "__id__": 7
+    },
+    "idleAnim": {
+      "__uuid__": "1677c565-e083-424b-93fd-9f652b7d4a81",
+      "__expectedType__": "cc.AnimationClip"
+    },
+    "dieAnim": {
+      "__uuid__": "1c2e695d-544d-4166-a8a0-96e30bac47aa",
+      "__expectedType__": "cc.AnimationClip"
+    },
+    "hitAnim": {
+      "__uuid__": "78fe2c60-4cd2-44e9-ad04-552d04f7643a",
+      "__expectedType__": "cc.AnimationClip"
+    },
     "_id": ""
   },
   {
@@ -386,12 +406,12 @@
     "__prefab": {
       "__id__": 17
     },
-    "enabledContactListener": false,
+    "enabledContactListener": true,
     "bullet": false,
     "awakeOnLoad": true,
     "_group": 1,
     "_type": 1,
-    "_allowSleep": true,
+    "_allowSleep": false,
     "_gravityScale": 1,
     "_linearDamping": 0,
     "_angularDamping": 0,

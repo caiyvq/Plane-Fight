@@ -794,6 +794,10 @@
       {
         "__uuid__": "ce097c91-58d3-493f-a77f-919ec53881eb",
         "__expectedType__": "cc.AnimationClip"
+      },
+      {
+        "__uuid__": "56ba8de9-e2b2-45ad-96e6-d6660e610a39",
+        "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
@@ -978,7 +982,8 @@
     "bullet2Position2": {
       "__id__": 23
     },
-    "shootType": 1,
+    "shootType": 0,
+    "lifePoint": 5,
     "_id": "59vKBQvbtDSpc9WfG8ri50"
   },
   {
@@ -1072,23 +1077,18 @@
     "_points": [
       {
         "__type__": "cc.Vec2",
-        "x": -50,
-        "y": -50
+        "x": -33,
+        "y": -13
       },
       {
         "__type__": "cc.Vec2",
-        "x": -50,
-        "y": 50
+        "x": 0,
+        "y": 40
       },
       {
         "__type__": "cc.Vec2",
-        "x": 50,
-        "y": 50
-      },
-      {
-        "__type__": "cc.Vec2",
-        "x": 50,
-        "y": -50
+        "x": 33,
+        "y": -13
       }
     ],
     "_id": "b6GwbIaXhAHbDZlMSy4vQL"
@@ -1103,7 +1103,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "enabledContactListener": false,
+    "enabledContactListener": true,
     "bullet": false,
     "awakeOnLoad": true,
     "_group": 1,

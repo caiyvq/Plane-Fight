@@ -27,6 +27,9 @@ export class player extends Component {
     bullet2Position2: Node = null;
     @property({ type: Enum(ShootType) })
     shootType: ShootType = ShootType.OneShot;
+    @property
+    lifePoint:number=5;
+    currentLifePoint:number=0;
 
     shootTimer: number = 0;
     leftBound: number = -230;
@@ -40,6 +43,10 @@ export class player extends Component {
 
     onDestroy(){
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    }
+
+    protected start(): void {
+        this.currentLifePoint=this.lifePoint;
     }
 
     update(dt: number) {
