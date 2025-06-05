@@ -13,7 +13,9 @@ import {
   SpriteFrame,
 } from "cc";
 import { poolManager } from "./poolManager";
+import { player } from "./player";
 const { ccclass, property } = _decorator;
+
 
 @ccclass("enemy")
 export class enemy extends Component {
@@ -40,7 +42,7 @@ export class enemy extends Component {
     this.currentLifePoint = this.lifePoint;
     this.collider = this.node.getComponent(Collider2D);
     if (this.collider) {
-      console.log('get collider');
+      // console.log('get collider');
       this.collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
   }
@@ -51,13 +53,22 @@ export class enemy extends Component {
     }
   }
 
-  onBeginContact(self:Collider2D,other:Collider2D) {
-    console.log("contact");
+  onBeginContact(self: Collider2D, other: Collider2D) {
+    // console.log(other.node.name);
     this.currentLifePoint--;
     if (this.currentLifePoint <= 0) {
       this.die();
     } else {
       this.hit();
+    }
+    if (other.node.name.includes("bullet")) {
+      other.enabled=false;
+      this.scheduleOnce(() => {
+        poolManager.instance().putNode(other.node);
+      }, 0.1);
+    }
+    if (other.node.name.includes("player")) {
+      other.node.getComponent(player).hit();
     }
   }
 
@@ -79,7 +90,7 @@ export class enemy extends Component {
   }
 
   hit() {
-    console.log('hit');
+    // console.log('hit');
     if (this.animation && this.hitAnim) {
       this.animation.play(this.hitAnim.name);
     }
@@ -99,7 +110,7 @@ export class enemy extends Component {
   }
 
   init() {
-    if(this.animation&&this.idleAnim){
+    if (this.animation && this.idleAnim) {
       this.animation.play(this.idleAnim.name);
     }
     this.currentSpeed = this.speed;

@@ -798,6 +798,10 @@
       {
         "__uuid__": "56ba8de9-e2b2-45ad-96e6-d6660e610a39",
         "__expectedType__": "cc.AnimationClip"
+      },
+      {
+        "__uuid__": "9c136255-4d45-4ec7-9d07-f1018da2cd09",
+        "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
@@ -961,7 +965,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "shootRate": 0.5,
+    "shootRate": 0.3,
     "bullet1Prefab": {
       "__uuid__": "3f41b41d-b614-4c53-84ae-1c345e520cd4",
       "__expectedType__": "cc.Prefab"
@@ -984,6 +988,21 @@
     },
     "shootType": 0,
     "lifePoint": 5,
+    "animation": {
+      "__id__": 20
+    },
+    "dieAnim": {
+      "__uuid__": "56ba8de9-e2b2-45ad-96e6-d6660e610a39",
+      "__expectedType__": "cc.AnimationClip"
+    },
+    "idleAnim": {
+      "__uuid__": "ce097c91-58d3-493f-a77f-919ec53881eb",
+      "__expectedType__": "cc.AnimationClip"
+    },
+    "hitAnim": {
+      "__uuid__": "9c136255-4d45-4ec7-9d07-f1018da2cd09",
+      "__expectedType__": "cc.AnimationClip"
+    },
     "_id": "59vKBQvbtDSpc9WfG8ri50"
   },
   {
@@ -1064,7 +1083,7 @@
     "_enabled": true,
     "__prefab": null,
     "tag": 0,
-    "_group": 1,
+    "_group": 8,
     "_density": 1,
     "_sensor": false,
     "_friction": 0.2,
@@ -1108,7 +1127,7 @@
     "awakeOnLoad": true,
     "_group": 1,
     "_type": 1,
-    "_allowSleep": true,
+    "_allowSleep": false,
     "_gravityScale": 1,
     "_linearDamping": 0,
     "_angularDamping": 0,
@@ -1215,7 +1234,7 @@
     },
     "enemy0Rate": 0.5,
     "enemy1Rate": 3,
-    "enemy2Rate": 10,
+    "enemy2Rate": 5,
     "_id": "4dCbbZQVhCJJUzPncqKIsS"
   },
   {

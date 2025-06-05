@@ -210,7 +210,7 @@
     "playOnLoad": false,
     "_clips": [
       {
-        "__uuid__": "1c2e695d-544d-4166-a8a0-96e30bac47aa",
+        "__uuid__": "1677c565-e083-424b-93fd-9f652b7d4a81",
         "__expectedType__": "cc.AnimationClip"
       },
       {
@@ -218,12 +218,12 @@
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "1677c565-e083-424b-93fd-9f652b7d4a81",
+        "__uuid__": "1c2e695d-544d-4166-a8a0-96e30bac47aa",
         "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
-      "__uuid__": "1c2e695d-544d-4166-a8a0-96e30bac47aa",
+      "__uuid__": "1677c565-e083-424b-93fd-9f652b7d4a81",
       "__expectedType__": "cc.AnimationClip"
     },
     "_id": ""
@@ -286,7 +286,7 @@
       "__id__": 13
     },
     "speed": 150,
-    "lifePoint": 8,
+    "lifePoint": 5,
     "animation": {
       "__id__": 7
     },
@@ -302,6 +302,7 @@
       "__uuid__": "78fe2c60-4cd2-44e9-ad04-552d04f7643a",
       "__expectedType__": "cc.AnimationClip"
     },
+    "currentLifePoint": 0,
     "_id": ""
   },
   {
@@ -321,7 +322,7 @@
       "__id__": 15
     },
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
     "_sensor": true,
     "_friction": 0.2,

@@ -210,16 +210,16 @@
     "playOnLoad": false,
     "_clips": [
       {
-        "__uuid__": "e5ad9b4a-036a-4d00-ac4e-7dd3af703674",
+        "__uuid__": "0642e394-ea4e-4567-bb1d-21611866c585",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "0642e394-ea4e-4567-bb1d-21611866c585",
+        "__uuid__": "e5ad9b4a-036a-4d00-ac4e-7dd3af703674",
         "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
-      "__uuid__": "e5ad9b4a-036a-4d00-ac4e-7dd3af703674",
+      "__uuid__": "0642e394-ea4e-4567-bb1d-21611866c585",
       "__expectedType__": "cc.AnimationClip"
     },
     "_id": ""
@@ -295,6 +295,7 @@
       "__expectedType__": "cc.AnimationClip"
     },
     "hitAnim": null,
+    "currentLifePoint": 0,
     "_id": ""
   },
   {
@@ -314,7 +315,7 @@
       "__id__": 15
     },
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
     "_sensor": true,
     "_friction": 0.2,

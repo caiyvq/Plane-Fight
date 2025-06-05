@@ -210,7 +210,7 @@
     "playOnLoad": false,
     "_clips": [
       {
-        "__uuid__": "59e19e18-a995-406c-9bdc-cf287352a877",
+        "__uuid__": "a7a21a9e-f587-45b7-a1af-3add35cd3b18",
         "__expectedType__": "cc.AnimationClip"
       },
       {
@@ -218,12 +218,12 @@
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "a7a21a9e-f587-45b7-a1af-3add35cd3b18",
+        "__uuid__": "59e19e18-a995-406c-9bdc-cf287352a877",
         "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
-      "__uuid__": "59e19e18-a995-406c-9bdc-cf287352a877",
+      "__uuid__": "a7a21a9e-f587-45b7-a1af-3add35cd3b18",
       "__expectedType__": "cc.AnimationClip"
     },
     "_id": ""
@@ -302,6 +302,7 @@
       "__uuid__": "54163021-e79f-4b7d-a589-9d500f43a1a0",
       "__expectedType__": "cc.AnimationClip"
     },
+    "currentLifePoint": 0,
     "_id": ""
   },
   {
@@ -321,7 +322,7 @@
       "__id__": 15
     },
     "tag": 0,
-    "_group": 1,
+    "_group": 2,
     "_density": 1,
     "_sensor": true,
     "_friction": 0.2,
