@@ -286,7 +286,7 @@
       "__id__": 13
     },
     "speed": 150,
-    "lifePoint": 5,
+    "lifePoint": 10,
     "animation": {
       "__id__": 7
     },

@@ -965,7 +965,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "shootRate": 0.3,
+    "shootRate": 0.2,
     "bullet1Prefab": {
       "__uuid__": "3f41b41d-b614-4c53-84ae-1c345e520cd4",
       "__expectedType__": "cc.Prefab"
@@ -1232,9 +1232,9 @@
       "__uuid__": "e33be226-6c9a-42c2-9f52-7d1da31c86ee",
       "__expectedType__": "cc.Prefab"
     },
-    "enemy0Rate": 0.5,
-    "enemy1Rate": 3,
-    "enemy2Rate": 5,
+    "enemy0Rate": 1,
+    "enemy1Rate": 5,
+    "enemy2Rate": 10,
     "_id": "4dCbbZQVhCJJUzPncqKIsS"
   },
   {

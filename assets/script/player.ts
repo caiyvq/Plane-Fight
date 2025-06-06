@@ -4,7 +4,9 @@ import {
   AnimationClip,
   Collider2D,
   Component,
+  Contact2DType,
   Enum,
+  EventMouse,
   EventTouch,
   Input,
   input,
@@ -21,6 +23,7 @@ const { ccclass, property } = _decorator;
 enum ShootType {
   OneShot,
   TwoShot,
+  None
 }
 
 @ccclass("player")
@@ -52,7 +55,7 @@ export class player extends Component {
   @property({ type: AnimationClip, displayName: "受击动画" })
   hitAnim: AnimationClip = null;
 
-  collider:Collider2D=null;
+  collider: Collider2D = null;
   currentLifePoint: number = 0;
   shootTimer: number = 0;
   leftBound: number = -230;
@@ -62,15 +65,20 @@ export class player extends Component {
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    input.on(Input.EventType.MOUSE_DOWN,this.onMouseDown,this);
   }
 
   onDestroy() {
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    input.off(Input.EventType.MOUSE_DOWN,this.onMouseDown,this);
   }
 
   protected start(): void {
     this.currentLifePoint = this.lifePoint;
-    this.collider=this.node.getComponent(Collider2D);
+    this.collider = this.node.getComponent(Collider2D);
+    if (this.collider) {
+      this.collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
   }
 
   update(dt: number) {
@@ -93,6 +101,29 @@ export class player extends Component {
     );
   }
 
+  onMouseDown(event: EventMouse){
+    // console.log(event.getButton());
+    if(event.getButton()==2){
+      if(this.shootType==ShootType.OneShot){
+        // console.log('one to two');
+        this.shootType=ShootType.TwoShot;
+      }
+      else if(this.shootType==ShootType.TwoShot){
+        // console.log('two to one');
+        this.shootType=ShootType.OneShot;
+      }
+    }
+  }
+
+  onBeginContact() {
+    this.currentLifePoint--;
+    if (this.currentLifePoint <= 0) {
+      this.die();
+    } else {
+      this.hit();
+    }
+  }
+
   shoot() {
     switch (this.shootType) {
       case ShootType.OneShot:
@@ -100,6 +131,8 @@ export class player extends Component {
         break;
       case ShootType.TwoShot:
         this.twoShoot();
+        break;
+      case ShootType.None:
         break;
     }
   }
@@ -124,24 +157,20 @@ export class player extends Component {
   }
 
   hit() {
-    console.log("hp-1");
-    this.currentLifePoint--;
-    if (this.currentLifePoint <= 0) {
-      this.die();
+    if (this.animation && this.hitAnim) {
+      this.animation.play(this.hitAnim.name);
     }
-    else{
-      if(this.animation&&this.hitAnim){
-        this.animation.play(this.hitAnim.name);
-      }
-      this.collider.enabled=false;
-      this.scheduleOnce(()=>{this.collider.enabled=true;},this.hitAnim.duration);
-    }
+    this.collider.enabled = false;
+    this.scheduleOnce(() => {
+      this.collider.enabled = true;
+    }, this.hitAnim.duration);
   }
 
   die() {
-    if(this.collider){
-      this.collider.enabled=false;
+    if (this.collider) {
+      this.collider.enabled = false;
     }
+    this.shootType=ShootType.None;
     if (this.animation && this.dieAnim) {
       this.animation.play(this.dieAnim.name);
     }

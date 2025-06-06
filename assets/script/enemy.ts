@@ -61,14 +61,11 @@ export class enemy extends Component {
     } else {
       this.hit();
     }
-    if (other.node.name.includes("bullet")) {
+    if (other.getComponent("bullet")) {
       other.enabled=false;
       this.scheduleOnce(() => {
         poolManager.instance().putNode(other.node);
-      }, 0.1);
-    }
-    if (other.node.name.includes("player")) {
-      other.node.getComponent(player).hit();
+      }, 0.05);
     }
   }
 
