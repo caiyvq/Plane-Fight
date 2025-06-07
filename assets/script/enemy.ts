@@ -14,13 +14,14 @@ import {
 } from "cc";
 import { poolManager } from "./poolManager";
 import { CollisionGroup, player } from "./player";
+import { bullet, BulletType } from "./bullet";
 const { ccclass, property } = _decorator;
 
 @ccclass("enemy")
 export class enemy extends Component {
   @property
   speed: number = 100;
-  @property
+  @property({ displayName: "最大血量" })
   lifePoint: number = 1;
   @property({ type: Animation, displayName: "动画器" })
   animation: Animation = null;
@@ -35,6 +36,7 @@ export class enemy extends Component {
   @property
   currentLifePoint: number = 0;
   collider: Collider2D = null;
+  unFreeze: Function = null;
 
   protected start(): void {
     this.currentSpeed = this.speed;
@@ -53,12 +55,17 @@ export class enemy extends Component {
   }
 
   onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
-    // console.log(other.node.name);
+    // console.log(typeof(otherCollider.node));
+    const bulletComp = otherCollider.node.getComponent(bullet);
     this.currentLifePoint--;
     if (this.currentLifePoint <= 0) {
       this.die();
     } else {
-      this.hit();
+      if (bulletComp && bulletComp.bulletType === BulletType.Ice) {
+        this.freeze();
+      } else {
+        this.hit();
+      }
     }
   }
 
@@ -84,6 +91,22 @@ export class enemy extends Component {
     if (this.animation && this.hitAnim) {
       this.animation.play(this.hitAnim.name);
     }
+  }
+
+  freeze() {
+    console.log("freeze");
+
+    this.currentSpeed = this.speed / 2;
+
+    if (this.unFreeze !== null) {
+      this.unschedule(this.unFreeze);
+    }
+
+    this.unFreeze = () => {
+      this.currentSpeed = this.speed;
+      this.unFreeze = null;
+    };
+    this.scheduleOnce(this.unFreeze, 5);
   }
 
   update(deltaTime: number) {

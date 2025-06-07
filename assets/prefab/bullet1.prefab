@@ -59,7 +59,7 @@
       "z": 1
     },
     "_mobility": 0,
-    "_layer": 33554432,
+    "_layer": 1,
     "_euler": {
       "__type__": "cc.Vec3",
       "x": 0,
@@ -153,7 +153,8 @@
     "__prefab": {
       "__id__": 7
     },
-    "speed": 500,
+    "speed": 700,
+    "bulletType": 0,
     "_id": ""
   },
   {

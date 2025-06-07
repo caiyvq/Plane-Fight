@@ -8,6 +8,7 @@ import {
   Enum,
   EventMouse,
   EventTouch,
+  game,
   Input,
   input,
   instantiate,
@@ -19,12 +20,13 @@ import {
 import { bullet } from "./bullet";
 import { poolManager } from "./poolManager";
 import { reward, RewardType } from "./reward";
+import { gameManager } from "./gameManager";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
   OneShoot,
   TwoShoot,
-  Bomb,
+  IceShoot,
   None,
 }
 
@@ -33,6 +35,7 @@ export enum CollisionGroup {
   Enemy = 1 << 2,
   Bullet = 1 << 3,
   Reward = 1 << 4,
+  Player_Invincible = 1 << 5,
 }
 
 @ccclass("player")
@@ -45,15 +48,15 @@ export class player extends Component {
   bullet2Prefab: Prefab = null;
   @property({ type: Node, tooltip: "所有子弹的父节点" })
   bulletParent: Node = null;
-  @property({ type: Node, tooltip: "子弹一的初始位置" })
-  bullet1Position: Node = null;
-  @property({ type: Node, tooltip: "子弹二的初始位置1" })
-  bullet2Position1: Node = null;
-  @property({ type: Node, tooltip: "子弹二的初始位置2" })
-  bullet2Position2: Node = null;
+  @property({ type: Node, tooltip: "单发子弹初始位置" })
+  position0: Node = null;
+  @property({ type: Node, tooltip: "双发子弹初始位置" })
+  position1: Node = null;
+  @property({ type: Node, tooltip: "双发子弹初始位置" })
+  position2: Node = null;
   @property({ type: Enum(ShootType) })
   shootType: ShootType = ShootType.OneShoot;
-  @property
+  @property({ displayName: "最大生命值" })
   lifePoint: number = 5;
   @property({ type: Animation, displayName: "动画器" })
   animation: Animation = null;
@@ -75,12 +78,12 @@ export class player extends Component {
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    // input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+    input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
   }
 
   onDestroy() {
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    // input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+    input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
   }
 
   protected start(): void {
@@ -111,18 +114,15 @@ export class player extends Component {
     );
   }
 
-  // onMouseDown(event: EventMouse) {
-  //   // console.log(event.getButton());
-  //   if (event.getButton() == 2) {
-  //     if (this.shootType == ShootType.OneShot) {
-  //       // console.log('one to two');
-  //       this.shootType = ShootType.TwoShot;
-  //     } else if (this.shootType == ShootType.TwoShot) {
-  //       // console.log('two to one');
-  //       this.shootType = ShootType.OneShot;
-  //     }
-  //   }
-  // }
+  onMouseDown(event: EventMouse) {
+    // console.log(event.getButton());
+    if (event.getButton() == 2) {
+      if (this.shootType == ShootType.OneShoot) {
+        // console.log('one to two');
+        this.switchShootType(ShootType.TwoShoot);
+      }
+    }
+  }
 
   onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
     // console.log(otherCollider.group);
@@ -144,8 +144,8 @@ export class player extends Component {
       case ShootType.TwoShoot:
         this.twoShoot();
         break;
-      case ShootType.Bomb:
-        this.bomb();
+      case ShootType.IceShoot:
+        this.iceShoot();
         break;
       case ShootType.None:
         break;
@@ -153,46 +153,56 @@ export class player extends Component {
   }
 
   oneShoot() {
-    let bullet1 = poolManager
+    let bullet = poolManager
       .instance()
       .getNode(this.bullet1Prefab, this.bulletParent);
-    bullet1.setWorldPosition(this.bullet1Position.worldPosition);
+    bullet.setWorldPosition(this.position0.worldPosition);
   }
 
   twoShoot() {
-    let bullet2_1 = poolManager
+    let bullet1 = poolManager
       .instance()
-      .getNode(this.bullet2Prefab, this.bulletParent);
-    bullet2_1.setWorldPosition(this.bullet2Position1.worldPosition);
+      .getNode(this.bullet1Prefab, this.bulletParent);
+    bullet1.setWorldPosition(this.position1.worldPosition);
 
-    let bullet2_2 = poolManager
+    let bullet2 = poolManager
       .instance()
-      .getNode(this.bullet2Prefab, this.bulletParent);
-    bullet2_2.setWorldPosition(this.bullet2Position2.worldPosition);
+      .getNode(this.bullet1Prefab, this.bulletParent);
+    bullet2.setWorldPosition(this.position2.worldPosition);
   }
 
-  bomb() {
-    console.log("bomb");
+  iceShoot() {
+    let bullet = poolManager
+      .instance()
+      .getNode(this.bullet2Prefab, this.bulletParent);
+    bullet.setWorldPosition(this.position0.worldPosition);
   }
 
   contactReward(otherCollider: Collider2D) {
     // console.log("contact reward");
+    switch (otherCollider.node.getComponent(reward).rewardType) {
+      case RewardType.IceShoot:
+        this.switchShootType(ShootType.IceShoot);
+        break;
+      case RewardType.Bomb:
+        // console.log("send Get Bomb event");
+        game.emit("Get Bomb");
+        break;
+    }
+  }
+
+  switchShootType(shootType: ShootType) {
+    // console.log("switch shoot type to " + shootType);
+    this.shootType = shootType;
+
     if (this.resetShootTypeTimer !== null) {
-      console.log("unschedule");
+      // console.log("unschedule");
       this.unschedule(this.resetShootTypeTimer);
     }
 
-    switch (otherCollider.node.getComponent(reward).rewardType) {
-      case RewardType.TwoShot:
-        this.shootType = ShootType.TwoShoot;
-        break;
-      case RewardType.Bomb:
-        this.shootType = ShootType.Bomb;
-        break;
-    }
     this.resetShootTypeTimer = () => {
       this.shootType = ShootType.OneShoot;
-      console.log("one shoot");
+      console.log("switch one shoot type");
       this.resetShootTypeTimer = null;
     };
     this.scheduleOnce(this.resetShootTypeTimer, 5);
@@ -212,9 +222,9 @@ export class player extends Component {
     if (this.animation && this.hitAnim) {
       this.animation.play(this.hitAnim.name);
     }
-    this.collider.enabled = false;
+    this.collider.group = CollisionGroup.Player_Invincible;
     this.scheduleOnce(() => {
-      this.collider.enabled = true;
+      this.collider.group = CollisionGroup.Player;
     }, this.hitAnim.duration);
   }
 

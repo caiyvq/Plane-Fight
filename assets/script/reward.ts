@@ -10,8 +10,8 @@ import { poolManager } from "./poolManager";
 const { ccclass, property } = _decorator;
 
 export enum RewardType {
-  TwoShot,
   Bomb,
+  IceShoot,
 }
 
 @ccclass("reward")
@@ -19,7 +19,7 @@ export class reward extends Component {
   @property
   speed: number = 100;
   @property({ type: Enum(RewardType), tooltip: "奖励类型" })
-  rewardType: RewardType = RewardType.TwoShot;
+  rewardType: RewardType = RewardType.Bomb;
 
   collider: Collider2D = null;
 

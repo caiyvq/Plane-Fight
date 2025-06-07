@@ -1,11 +1,18 @@
-import { _decorator, Collider2D, Component, Contact2DType, Node } from "cc";
+import { _decorator, Collider2D, Component, Contact2DType, Enum, Node } from "cc";
 import { poolManager } from "./poolManager";
 const { ccclass, property } = _decorator;
+
+export enum BulletType {
+  Normal,
+  Ice
+}
 
 @ccclass("bullet")
 export class bullet extends Component {
   @property({ tooltip: "子弹速度" })
   speed: number = 400;
+  @property({type:Enum(BulletType), displayName: "子弹类型"})
+  bulletType: BulletType = BulletType.Normal;
 
   collider: Collider2D = null;
 

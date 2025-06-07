@@ -23,6 +23,10 @@
       {
         "index": 4,
         "name": "Reward"
+      },
+      {
+        "index": 5,
+        "name": "Player-Invinvible"
       }
     ],
     "collisionMatrix": {
@@ -30,7 +34,14 @@
       "1": 20,
       "2": 10,
       "3": 4,
-      "4": 2
+      "4": 34,
+      "5": 16
     }
-  }
+  },
+  "layer": [
+    {
+      "name": "GAME",
+      "value": 1
+    }
+  ]
 }
