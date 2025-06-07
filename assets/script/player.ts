@@ -18,12 +18,21 @@ import {
 } from "cc";
 import { bullet } from "./bullet";
 import { poolManager } from "./poolManager";
+import { reward, RewardType } from "./reward";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
-  OneShot,
-  TwoShot,
-  None
+  OneShoot,
+  TwoShoot,
+  Bomb,
+  None,
+}
+
+export enum CollisionGroup {
+  Player = 1 << 1,
+  Enemy = 1 << 2,
+  Bullet = 1 << 3,
+  Reward = 1 << 4,
 }
 
 @ccclass("player")
@@ -38,12 +47,12 @@ export class player extends Component {
   bulletParent: Node = null;
   @property({ type: Node, tooltip: "子弹一的初始位置" })
   bullet1Position: Node = null;
-  @property({ type: Node, tooltip: "子弹二的初始位置" })
+  @property({ type: Node, tooltip: "子弹二的初始位置1" })
   bullet2Position1: Node = null;
-  @property({ type: Node, tooltip: "子弹二的初始位置" })
+  @property({ type: Node, tooltip: "子弹二的初始位置2" })
   bullet2Position2: Node = null;
   @property({ type: Enum(ShootType) })
-  shootType: ShootType = ShootType.OneShot;
+  shootType: ShootType = ShootType.OneShoot;
   @property
   lifePoint: number = 5;
   @property({ type: Animation, displayName: "动画器" })
@@ -62,15 +71,16 @@ export class player extends Component {
   rightBound: number = 230;
   upBound: number = 390;
   downBound: number = -410;
+  resetShootTypeTimer: Function = null;
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    input.on(Input.EventType.MOUSE_DOWN,this.onMouseDown,this);
+    // input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
   }
 
   onDestroy() {
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    input.off(Input.EventType.MOUSE_DOWN,this.onMouseDown,this);
+    // input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
   }
 
   protected start(): void {
@@ -101,36 +111,41 @@ export class player extends Component {
     );
   }
 
-  onMouseDown(event: EventMouse){
-    // console.log(event.getButton());
-    if(event.getButton()==2){
-      if(this.shootType==ShootType.OneShot){
-        // console.log('one to two');
-        this.shootType=ShootType.TwoShot;
-      }
-      else if(this.shootType==ShootType.TwoShot){
-        // console.log('two to one');
-        this.shootType=ShootType.OneShot;
-      }
-    }
-  }
+  // onMouseDown(event: EventMouse) {
+  //   // console.log(event.getButton());
+  //   if (event.getButton() == 2) {
+  //     if (this.shootType == ShootType.OneShot) {
+  //       // console.log('one to two');
+  //       this.shootType = ShootType.TwoShot;
+  //     } else if (this.shootType == ShootType.TwoShot) {
+  //       // console.log('two to one');
+  //       this.shootType = ShootType.OneShot;
+  //     }
+  //   }
+  // }
 
-  onBeginContact() {
-    this.currentLifePoint--;
-    if (this.currentLifePoint <= 0) {
-      this.die();
-    } else {
-      this.hit();
+  onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+    // console.log(otherCollider.group);
+    switch (otherCollider.group) {
+      case CollisionGroup.Enemy:
+        this.contactEnemy();
+        break;
+      case CollisionGroup.Reward:
+        this.contactReward(otherCollider);
+        break;
     }
   }
 
   shoot() {
     switch (this.shootType) {
-      case ShootType.OneShot:
+      case ShootType.OneShoot:
         this.oneShoot();
         break;
-      case ShootType.TwoShot:
+      case ShootType.TwoShoot:
         this.twoShoot();
+        break;
+      case ShootType.Bomb:
+        this.bomb();
         break;
       case ShootType.None:
         break;
@@ -156,6 +171,43 @@ export class player extends Component {
     bullet2_2.setWorldPosition(this.bullet2Position2.worldPosition);
   }
 
+  bomb() {
+    console.log("bomb");
+  }
+
+  contactReward(otherCollider: Collider2D) {
+    // console.log("contact reward");
+    if (this.resetShootTypeTimer !== null) {
+      console.log("unschedule");
+      this.unschedule(this.resetShootTypeTimer);
+    }
+
+    switch (otherCollider.node.getComponent(reward).rewardType) {
+      case RewardType.TwoShot:
+        this.shootType = ShootType.TwoShoot;
+        break;
+      case RewardType.Bomb:
+        this.shootType = ShootType.Bomb;
+        break;
+    }
+    this.resetShootTypeTimer = () => {
+      this.shootType = ShootType.OneShoot;
+      console.log("one shoot");
+      this.resetShootTypeTimer = null;
+    };
+    this.scheduleOnce(this.resetShootTypeTimer, 5);
+  }
+
+  contactEnemy() {
+    // console.log("contact enemy");
+    this.currentLifePoint--;
+    if (this.currentLifePoint <= 0) {
+      this.die();
+    } else {
+      this.hit();
+    }
+  }
+
   hit() {
     if (this.animation && this.hitAnim) {
       this.animation.play(this.hitAnim.name);
@@ -170,7 +222,7 @@ export class player extends Component {
     if (this.collider) {
       this.collider.enabled = false;
     }
-    this.shootType=ShootType.None;
+    this.shootType = ShootType.None;
     if (this.animation && this.dieAnim) {
       this.animation.play(this.dieAnim.name);
     }

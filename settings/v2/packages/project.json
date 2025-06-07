@@ -10,22 +10,27 @@
     "collisionGroups": [
       {
         "index": 1,
-        "name": "ENEMY"
+        "name": "Player"
       },
       {
         "index": 2,
-        "name": "BULLET"
+        "name": "Enemy"
       },
       {
         "index": 3,
-        "name": "PLAYER"
+        "name": "Bullet"
+      },
+      {
+        "index": 4,
+        "name": "Reward"
       }
     ],
     "collisionMatrix": {
       "0": 1,
-      "1": 12,
-      "2": 2,
-      "3": 2
+      "1": 20,
+      "2": 10,
+      "3": 4,
+      "4": 2
     }
   }
 }

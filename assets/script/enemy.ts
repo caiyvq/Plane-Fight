@@ -13,9 +13,8 @@ import {
   SpriteFrame,
 } from "cc";
 import { poolManager } from "./poolManager";
-import { player } from "./player";
+import { CollisionGroup, player } from "./player";
 const { ccclass, property } = _decorator;
-
 
 @ccclass("enemy")
 export class enemy extends Component {
@@ -53,19 +52,13 @@ export class enemy extends Component {
     }
   }
 
-  onBeginContact(self: Collider2D, other: Collider2D) {
+  onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
     // console.log(other.node.name);
     this.currentLifePoint--;
     if (this.currentLifePoint <= 0) {
       this.die();
     } else {
       this.hit();
-    }
-    if (other.getComponent("bullet")) {
-      other.enabled=false;
-      this.scheduleOnce(() => {
-        poolManager.instance().putNode(other.node);
-      }, 0.05);
     }
   }
 
