@@ -216,6 +216,10 @@
       {
         "__uuid__": "e5ad9b4a-036a-4d00-ac4e-7dd3af703674",
         "__expectedType__": "cc.AnimationClip"
+      },
+      {
+        "__uuid__": "d3ad556a-26b2-4e5c-8d33-eef828e6cf7b",
+        "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
@@ -295,6 +299,10 @@
       "__expectedType__": "cc.AnimationClip"
     },
     "hitAnim": null,
+    "freezeAnim": {
+      "__uuid__": "d3ad556a-26b2-4e5c-8d33-eef828e6cf7b",
+      "__expectedType__": "cc.AnimationClip"
+    },
     "currentLifePoint": 0,
     "_id": ""
   },

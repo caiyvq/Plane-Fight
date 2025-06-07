@@ -75,6 +75,8 @@ export class player extends Component {
   upBound: number = 390;
   downBound: number = -410;
   resetShootTypeTimer: Function = null;
+  isCollidingBomb: boolean = false;
+  isCollidingIce: boolean = false;
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -92,6 +94,7 @@ export class player extends Component {
     if (this.collider) {
       this.collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
+    game.emit("Life Change", this.currentLifePoint);
   }
 
   update(dt: number) {
@@ -114,6 +117,7 @@ export class player extends Component {
     );
   }
 
+  //TODO:击杀敌人获得一定分数后可以开启双弹 
   onMouseDown(event: EventMouse) {
     // console.log(event.getButton());
     if (event.getButton() == 2) {
@@ -126,6 +130,7 @@ export class player extends Component {
 
   onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
     // console.log(otherCollider.group);
+
     switch (otherCollider.group) {
       case CollisionGroup.Enemy:
         this.contactEnemy();
@@ -182,13 +187,31 @@ export class player extends Component {
     // console.log("contact reward");
     switch (otherCollider.node.getComponent(reward).rewardType) {
       case RewardType.IceShoot:
-        this.switchShootType(ShootType.IceShoot);
+        this.collidingIce();
         break;
       case RewardType.Bomb:
         // console.log("send Get Bomb event");
-        game.emit("Get Bomb");
+        this.collidingBomb();
         break;
     }
+  }
+
+  collidingIce() {
+    if (this.isCollidingIce) return;
+    this.isCollidingIce = true;
+    this.switchShootType(ShootType.IceShoot);
+    this.scheduleOnce(() => {
+      this.isCollidingIce = false;
+    }, 0);
+  }
+
+  collidingBomb() {
+    if (this.isCollidingBomb) return;
+    this.isCollidingBomb = true;
+    game.emit("Get Bomb");
+    this.scheduleOnce(() => {
+      this.isCollidingBomb = false;
+    }, 0);
   }
 
   switchShootType(shootType: ShootType) {
@@ -202,7 +225,7 @@ export class player extends Component {
 
     this.resetShootTypeTimer = () => {
       this.shootType = ShootType.OneShoot;
-      console.log("switch one shoot type");
+      // console.log("switch one shoot type");
       this.resetShootTypeTimer = null;
     };
     this.scheduleOnce(this.resetShootTypeTimer, 5);
@@ -211,6 +234,7 @@ export class player extends Component {
   contactEnemy() {
     // console.log("contact enemy");
     this.currentLifePoint--;
+    game.emit("Life Change", this.currentLifePoint);
     if (this.currentLifePoint <= 0) {
       this.die();
     } else {

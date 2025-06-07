@@ -18,6 +18,8 @@ export class gameManager extends Component {
 
   @property({ type: LabelComponent, displayName: "炸弹数量" })
   bombLabel: LabelComponent = null;
+  @property({type:LabelComponent,displayName:'生命值'})
+  lifeLabel: LabelComponent = null;
 
   bombCount: number = 0;
 
@@ -27,11 +29,13 @@ export class gameManager extends Component {
       return;
     }
     gameManager._instance = this;
+    // console.log("listening for Get Bomb event");
+    game.on('Get Bomb', this.getBomb, this);
+    //@ts-ignore
+    game.on('Life Change', (currentLifePoint: number)=> { this.lifeChange(currentLifePoint); }, this);
   }
 
   protected start(): void {
-    // console.log("listening for Get Bomb event");
-    game.on('Get Bomb', this.getBomb, this);
   }
 
   protected onDestroy(): void {
@@ -39,6 +43,7 @@ export class gameManager extends Component {
       gameManager._instance = null;
     }
     game.off('Get Bomb', this.getBomb, this);
+    game.off('Life Change', this.lifeChange, this);
   }
 
   getBomb() {
@@ -47,6 +52,13 @@ export class gameManager extends Component {
     if (this.bombLabel) {
     //   console.log("bombCount: " + this.bombCount);
       this.bombLabel.string = this.bombCount.toString();
+    }
+  }
+
+  lifeChange(currentLifePoint: number) {
+    // console.log("lifeChange");
+    if (this.lifeLabel) {
+      this.lifeLabel.string = currentLifePoint.toString();
     }
   }
 }

@@ -31,16 +31,19 @@ export class enemy extends Component {
   dieAnim: AnimationClip = null;
   @property({ type: AnimationClip, displayName: "受击动画" })
   hitAnim: AnimationClip = null;
+  @property({ type: AnimationClip, displayName: "冻结动画" })
+  freezeAnim: AnimationClip = null;
 
   currentSpeed: number = 0;
-  @property
   currentLifePoint: number = 0;
+  sprite: Sprite = null;
   collider: Collider2D = null;
   unFreeze: Function = null;
 
   protected start(): void {
     this.currentSpeed = this.speed;
     this.currentLifePoint = this.lifePoint;
+    this.sprite = this.node.getComponentInChildren(Sprite);
     this.collider = this.node.getComponent(Collider2D);
     if (this.collider) {
       // console.log('get collider');
@@ -94,9 +97,13 @@ export class enemy extends Component {
   }
 
   freeze() {
-    console.log("freeze");
+    // console.log("freeze");
 
     this.currentSpeed = this.speed / 2;
+
+    if (this.animation && this.freezeAnim) {
+      this.animation.play(this.freezeAnim.name);
+    }
 
     if (this.unFreeze !== null) {
       this.unschedule(this.unFreeze);
@@ -106,7 +113,7 @@ export class enemy extends Component {
       this.currentSpeed = this.speed;
       this.unFreeze = null;
     };
-    this.scheduleOnce(this.unFreeze, 5);
+    this.scheduleOnce(this.unFreeze, this.freezeAnim?.duration);
   }
 
   update(deltaTime: number) {
@@ -131,5 +138,6 @@ export class enemy extends Component {
     if (this.collider) {
       this.collider.enabled = true;
     }
+    this.sprite?.color.set(255, 255, 255, 255);
   }
 }
