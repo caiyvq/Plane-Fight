@@ -7,6 +7,7 @@ import {
   Component,
   Contact2DType,
   CurveRange,
+  game,
   Node,
   RigidBody2D,
   Sprite,
@@ -15,6 +16,7 @@ import {
 import { poolManager } from "./poolManager";
 import { CollisionGroup, player } from "./player";
 import { bullet, BulletType } from "./bullet";
+import { GameEvents, gameManager } from "./gameManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("enemy")
@@ -33,12 +35,15 @@ export class enemy extends Component {
   hitAnim: AnimationClip = null;
   @property({ type: AnimationClip, displayName: "冻结动画" })
   freezeAnim: AnimationClip = null;
+  @property({displayName:'分值'})
+  score: number = 10;
 
   currentSpeed: number = 0;
   currentLifePoint: number = 0;
   sprite: Sprite = null;
   collider: Collider2D = null;
   unFreeze: Function = null;
+  isColliding: boolean = false;
 
   protected start(): void {
     this.currentSpeed = this.speed;
@@ -59,6 +64,12 @@ export class enemy extends Component {
 
   onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
     // console.log(typeof(otherCollider.node));
+    //防止一帧多次撞击
+    if(this.isColliding){
+      return;
+    }
+    this.isColliding = true;
+
     const bulletComp = otherCollider.node.getComponent(bullet);
     this.currentLifePoint--;
     if (this.currentLifePoint <= 0) {
@@ -70,10 +81,13 @@ export class enemy extends Component {
         this.hit();
       }
     }
+
+    this.scheduleOnce(()=>{this.isColliding = false;}, 0);
   }
 
   die() {
     // console.log("die");
+    game.emit(GameEvents.SCORE_ADD, this.score);
     if (this.collider) {
       this.collider.enabled = false;
     }

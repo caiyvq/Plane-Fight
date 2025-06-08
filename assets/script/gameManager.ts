@@ -1,6 +1,14 @@
-import { _decorator, Component, game, Label, LabelComponent, Node } from "cc";
+import { _decorator, Component, director, game, Label, LabelComponent, Node } from "cc";
 import { player } from "./player";
 const { ccclass, property } = _decorator;
+
+export const GameEvents = {
+    GET_BOMB: 'Get Bomb',
+    LIFE_CHANGE: 'Life Change',
+    SCORE_ADD: 'Score Add',
+    PLAYER_ENABLE: 'Player Enable',
+    PLAYER_DISABLE: 'Player Disable',
+} as const;
 
 @ccclass("gameManager")
 export class gameManager extends Component {
@@ -20,8 +28,15 @@ export class gameManager extends Component {
   bombLabel: LabelComponent = null;
   @property({type:LabelComponent,displayName:'生命值'})
   lifeLabel: LabelComponent = null;
+  @property({type:LabelComponent,displayName:'分数'})
+  scoreLabel: LabelComponent = null;
+  @property({ type: Node, displayName: "暂停按钮" })
+  pauseButton: Node = null;
+  @property({ type: Node, displayName: "继续按钮" })
+  resumeButton: Node = null;
 
   bombCount: number = 0;
+  score: number = 0;
 
   protected onLoad(): void {
     if (gameManager._instance) {
@@ -30,9 +45,11 @@ export class gameManager extends Component {
     }
     gameManager._instance = this;
     // console.log("listening for Get Bomb event");
-    game.on('Get Bomb', this.getBomb, this);
+    game.on(GameEvents.GET_BOMB, this.getBomb, this);
     //@ts-ignore
-    game.on('Life Change', (currentLifePoint: number)=> { this.lifeChange(currentLifePoint); }, this);
+    game.on(GameEvents.LIFE_CHANGE, (currentLifePoint: number)=> { this.lifeChange(currentLifePoint); }, this);
+    //@ts-ignore
+    game.on(GameEvents.SCORE_ADD, (score: number) => { this.addScore(score); }, this);
   }
 
   protected start(): void {
@@ -42,8 +59,8 @@ export class gameManager extends Component {
     if (gameManager._instance === this) {
       gameManager._instance = null;
     }
-    game.off('Get Bomb', this.getBomb, this);
-    game.off('Life Change', this.lifeChange, this);
+    game.off(GameEvents.GET_BOMB, this.getBomb, this);
+    game.off(GameEvents.LIFE_CHANGE, this.lifeChange, this);
   }
 
   getBomb() {
@@ -59,6 +76,37 @@ export class gameManager extends Component {
     // console.log("lifeChange");
     if (this.lifeLabel) {
       this.lifeLabel.string = currentLifePoint.toString();
+    }
+  }
+
+  addScore(score: number) {
+    // console.log("addScore");
+    this.score += score;
+    if (this.scoreLabel) {
+      this.scoreLabel.string = this.score.toString();
+    }
+
+  }
+
+  onPauseButtonClick() {
+    director.pause();
+    game.emit(GameEvents.PLAYER_DISABLE);
+    if (this.pauseButton) {
+      this.pauseButton.active = false;
+    }
+    if (this.resumeButton) {
+      this.resumeButton.active = true;
+    }
+  }
+
+  onResumeButtonClick() {
+    director.resume();
+    game.emit(GameEvents.PLAYER_ENABLE);
+    if (this.pauseButton) {
+      this.pauseButton.active = true;
+    }
+    if (this.resumeButton) {
+      this.resumeButton.active = false;
     }
   }
 }

@@ -20,7 +20,7 @@ import {
 import { bullet } from "./bullet";
 import { poolManager } from "./poolManager";
 import { reward, RewardType } from "./reward";
-import { gameManager } from "./gameManager";
+import { GameEvents, gameManager } from "./gameManager";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
@@ -77,15 +77,21 @@ export class player extends Component {
   resetShootTypeTimer: Function = null;
   isCollidingBomb: boolean = false;
   isCollidingIce: boolean = false;
+  controllable: boolean = true;
+  aliveScore: number = 0;
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
     input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+    game.on(GameEvents.PLAYER_DISABLE, this.disableControl, this);
+    game.on(GameEvents.PLAYER_ENABLE, this.enableControl, this);
   }
 
   onDestroy() {
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
     input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+    game.off(GameEvents.PLAYER_DISABLE, this.disableControl, this);
+    game.off(GameEvents.PLAYER_ENABLE, this.enableControl, this);
   }
 
   protected start(): void {
@@ -103,10 +109,18 @@ export class player extends Component {
       this.shootTimer = 0;
       this.shoot();
     }
+    this.aliveScore += dt;
+    if (this.aliveScore >= 0.1) {
+      game.emit(GameEvents.SCORE_ADD, Math.floor(this.aliveScore*10));
+      this.aliveScore = 0;
+    }
   }
 
   onTouchMove(event: EventTouch) {
     //console.log(event);
+    //if(director.isPaused()) return;
+    if (!this.controllable) return;
+
     let p = new Vec3(
       this.node.position.x + event.getDeltaX(),
       this.node.position.y + event.getDeltaY()
@@ -117,7 +131,7 @@ export class player extends Component {
     );
   }
 
-  //TODO:击杀敌人获得一定分数后可以开启双弹 
+  //TODO:击杀敌人获得一定分数后可以开启双弹
   onMouseDown(event: EventMouse) {
     // console.log(event.getButton());
     if (event.getButton() == 2) {
@@ -208,7 +222,7 @@ export class player extends Component {
   collidingBomb() {
     if (this.isCollidingBomb) return;
     this.isCollidingBomb = true;
-    game.emit("Get Bomb");
+    game.emit(GameEvents.GET_BOMB);
     this.scheduleOnce(() => {
       this.isCollidingBomb = false;
     }, 0);
@@ -234,7 +248,7 @@ export class player extends Component {
   contactEnemy() {
     // console.log("contact enemy");
     this.currentLifePoint--;
-    game.emit("Life Change", this.currentLifePoint);
+    game.emit(GameEvents.LIFE_CHANGE, this.currentLifePoint);
     if (this.currentLifePoint <= 0) {
       this.die();
     } else {
@@ -263,5 +277,13 @@ export class player extends Component {
     this.schedule(() => {
       this.node.destroy();
     }, this.dieAnim.duration);
+  }
+
+  disableControl() {
+    this.controllable = false;
+  }
+
+  enableControl() {
+    this.controllable = true;
   }
 }
