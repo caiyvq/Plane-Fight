@@ -37,6 +37,8 @@ export class enemy extends Component {
   freezeAnim: AnimationClip = null;
   @property({displayName:'分值'})
   score: number = 10;
+  @property({displayName:'能量值'})
+  energy: number = 1;
 
   currentSpeed: number = 0;
   currentLifePoint: number = 0;
@@ -88,6 +90,7 @@ export class enemy extends Component {
   die() {
     // console.log("die");
     game.emit(GameEvents.SCORE_ADD, this.score);
+    game.emit(GameEvents.ENERGY_ADD, this.energy);
     if (this.collider) {
       this.collider.enabled = false;
     }

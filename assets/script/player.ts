@@ -3,6 +3,7 @@ import {
   Animation,
   AnimationClip,
   Collider2D,
+  Color,
   Component,
   Contact2DType,
   Enum,
@@ -15,6 +16,7 @@ import {
   math,
   Node,
   Prefab,
+  Sprite,
   Vec3,
 } from "cc";
 import { bullet } from "./bullet";
@@ -77,14 +79,26 @@ export class player extends Component {
   resetShootTypeTimer: Function = null;
   isCollidingBomb: boolean = false;
   isCollidingIce: boolean = false;
+  isCollidingEnemy: boolean = false;
   controllable: boolean = true;
   aliveScore: number = 0;
+  energy: number = 0;
+  maxEnergy: number = 10;
+  fullEnergyState: boolean = false;
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
     input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
     game.on(GameEvents.PLAYER_DISABLE, this.disableControl, this);
     game.on(GameEvents.PLAYER_ENABLE, this.enableControl, this);
+    game.on(
+      GameEvents.ENERGY_ADD,
+      //@ts-ignore
+      (energy: number) => {
+        this.addEnergy(energy);
+      },
+      this
+    );
   }
 
   onDestroy() {
@@ -92,6 +106,14 @@ export class player extends Component {
     input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
     game.off(GameEvents.PLAYER_DISABLE, this.disableControl, this);
     game.off(GameEvents.PLAYER_ENABLE, this.enableControl, this);
+    game.off(
+      GameEvents.ENERGY_ADD,
+      //@ts-ignore
+      (energy: number) => {
+        this.addEnergy(energy);
+      },
+      this
+    );
   }
 
   protected start(): void {
@@ -111,7 +133,7 @@ export class player extends Component {
     }
     this.aliveScore += dt;
     if (this.aliveScore >= 0.1) {
-      game.emit(GameEvents.SCORE_ADD, Math.floor(this.aliveScore*10));
+      game.emit(GameEvents.SCORE_ADD, Math.floor(this.aliveScore * 10));
       this.aliveScore = 0;
     }
   }
@@ -131,15 +153,43 @@ export class player extends Component {
     );
   }
 
-  //TODO:击杀敌人获得一定分数后可以开启双弹
+  //击杀敌人获得一定能量后可以开启双弹
   onMouseDown(event: EventMouse) {
     // console.log(event.getButton());
     if (event.getButton() == 2) {
-      if (this.shootType == ShootType.OneShoot) {
+      if (this.shootType == ShootType.OneShoot && this.fullEnergyState) {
         // console.log('one to two');
         this.switchShootType(ShootType.TwoShoot);
+        this.releaseEnergy();
       }
     }
+  }
+
+  addEnergy(energy: number) {
+    if (this.energy < this.maxEnergy && this.shootType != ShootType.TwoShoot) {
+      this.energy += energy;
+      console.log("add energy");
+    }
+    if (this.energy >= this.maxEnergy && !this.fullEnergyState) {
+      this.fullEnergyState = true;
+      this.node.getComponentInChildren(Sprite).color = new Color(
+        255,
+        255,
+        0,
+        255
+      );
+    }
+  }
+
+  releaseEnergy() {
+    this.energy = 0;
+    this.fullEnergyState = false;
+    this.node.getComponentInChildren(Sprite).color = new Color(
+      255,
+      255,
+      255,
+      255
+    );
   }
 
   onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
@@ -155,6 +205,7 @@ export class player extends Component {
     }
   }
 
+  //TODO:机制修改：常态单发，拾取资源变冷冻，能量满时常态和冷冻都可变双发
   shoot() {
     switch (this.shootType) {
       case ShootType.OneShoot:
@@ -247,6 +298,9 @@ export class player extends Component {
 
   contactEnemy() {
     // console.log("contact enemy");
+    if(this.isCollidingEnemy) return;
+    this.isCollidingEnemy = true;
+
     this.currentLifePoint--;
     game.emit(GameEvents.LIFE_CHANGE, this.currentLifePoint);
     if (this.currentLifePoint <= 0) {
@@ -254,6 +308,10 @@ export class player extends Component {
     } else {
       this.hit();
     }
+    //防止一帧多次撞击
+    this.scheduleOnce(() => {
+      this.isCollidingEnemy = false;
+    }, 0);
   }
 
   hit() {
@@ -276,6 +334,7 @@ export class player extends Component {
     }
     this.schedule(() => {
       this.node.destroy();
+      game.emit(GameEvents.GAME_OVER);
     }, this.dieAnim.duration);
   }
 
