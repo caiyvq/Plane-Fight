@@ -19,16 +19,16 @@ import {
   Sprite,
   Vec3,
 } from "cc";
-import { bullet } from "./bullet";
+import { bullet, BulletType } from './bullet';
 import { poolManager } from "./poolManager";
 import { reward, RewardType } from "./reward";
 import { GameEvents, gameManager } from "./gameManager";
+import { AudioTypes } from "./audioManager";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
   OneShoot,
   TwoShoot,
-  IceShoot,
   None,
 }
 
@@ -44,10 +44,8 @@ export enum CollisionGroup {
 export class player extends Component {
   @property({ tooltip: "子弹发射时间间隔" })
   shootRate: number = 0.5;
-  @property(Prefab)
-  bullet1Prefab: Prefab = null;
-  @property(Prefab)
-  bullet2Prefab: Prefab = null;
+  @property({ type: [Prefab], tooltip: "子弹预制体" })
+  bulletPrefab: Prefab[] = [];
   @property({ type: Node, tooltip: "所有子弹的父节点" })
   bulletParent: Node = null;
   @property({ type: Node, tooltip: "单发子弹初始位置" })
@@ -56,8 +54,6 @@ export class player extends Component {
   position1: Node = null;
   @property({ type: Node, tooltip: "双发子弹初始位置" })
   position2: Node = null;
-  @property({ type: Enum(ShootType) })
-  shootType: ShootType = ShootType.OneShoot;
   @property({ displayName: "最大生命值" })
   lifePoint: number = 5;
   @property({ type: Animation, displayName: "动画器" })
@@ -69,22 +65,27 @@ export class player extends Component {
   @property({ type: AnimationClip, displayName: "受击动画" })
   hitAnim: AnimationClip = null;
 
-  collider: Collider2D = null;
-  currentLifePoint: number = 0;
-  shootTimer: number = 0;
-  leftBound: number = -230;
-  rightBound: number = 230;
-  upBound: number = 390;
-  downBound: number = -410;
-  resetShootTypeTimer: Function = null;
-  isCollidingBomb: boolean = false;
-  isCollidingIce: boolean = false;
-  isCollidingEnemy: boolean = false;
-  controllable: boolean = true;
-  aliveScore: number = 0;
-  energy: number = 0;
-  maxEnergy: number = 10;
-  fullEnergyState: boolean = false;
+  collider: Collider2D = null; //碰撞器
+  currentLifePoint: number = 0; //当前生命值
+  shootTimer: number = 0; //子弹发射计时器
+  leftBound: number = -230;//左边界
+  rightBound: number = 230;//右边界
+  upBound: number = 390;//上边界
+  downBound: number = -410;//下边界
+  resetShootTypeTimer: Function = null; //重置射击类型计时器
+  resetBulletTypeTimer: Function = null; //重置子弹类型计时器
+  isCollidingBomb: boolean = false; //是否正在碰撞炸弹奖励
+  isCollidingIce: boolean = false; //是否正在碰撞冰冻奖励
+  isCollidingEnemy: boolean = false; //是否正在碰撞敌人
+  controllable: boolean = true; //是否可控
+  aliveScore: number = 0; //存活分数
+  energy: number = 0; //当前能量值
+  maxEnergy: number = 10; //最大能量值
+  fullEnergyState: boolean = false; //是否满能量状态
+  lastClickTime: number = 0; //上次点击时间
+  private readonly DOUBLE_CLICK_TIME_INTERVAL: number = 300; //双击时间间隔
+  shootType: ShootType = ShootType.OneShoot;  //射击类型
+  bulletType: BulletType = BulletType.Normal; //子弹类型
 
   onLoad() {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -125,13 +126,13 @@ export class player extends Component {
     game.emit("Life Change", this.currentLifePoint);
   }
 
-  update(dt: number) {
-    this.shootTimer += dt;
+  update(deltaTime: number) {
+    this.shootTimer += deltaTime;
     if (this.shootTimer >= this.shootRate) {
       this.shootTimer = 0;
       this.shoot();
     }
-    this.aliveScore += dt;
+    this.aliveScore += deltaTime;
     if (this.aliveScore >= 0.1) {
       game.emit(GameEvents.SCORE_ADD, Math.floor(this.aliveScore * 10));
       this.aliveScore = 0;
@@ -156,6 +157,9 @@ export class player extends Component {
   //击杀敌人获得一定能量后可以开启双弹
   onMouseDown(event: EventMouse) {
     // console.log(event.getButton());
+    const currentTime = game.totalTime;
+    // console.log('currentTime: ', currentTime, ' lastClickTime: ', this.lastClickTime);
+
     if (event.getButton() == 2) {
       if (this.shootType == ShootType.OneShoot && this.fullEnergyState) {
         // console.log('one to two');
@@ -163,12 +167,26 @@ export class player extends Component {
         this.releaseEnergy();
       }
     }
+
+    if (event.getButton() == 0) {
+      if(currentTime - this.lastClickTime <= this.DOUBLE_CLICK_TIME_INTERVAL) {
+        this.onDoubleClick();
+        this.lastClickTime = 0; // 重置上次点击时间
+      }else{
+        this.lastClickTime = currentTime; // 更新上次点击时间
+      }
+    }
+  }
+
+  onDoubleClick() {
+    // console.log("double click");
+    game.emit(GameEvents.USE_BOMB);
   }
 
   addEnergy(energy: number) {
     if (this.energy < this.maxEnergy && this.shootType != ShootType.TwoShoot) {
       this.energy += energy;
-      console.log("add energy");
+      // console.log("add energy");
     }
     if (this.energy >= this.maxEnergy && !this.fullEnergyState) {
       this.fullEnergyState = true;
@@ -205,7 +223,7 @@ export class player extends Component {
     }
   }
 
-  //TODO:机制修改：常态单发，拾取资源变冷冻，能量满时常态和冷冻都可变双发
+  //常态单发，拾取资源变冷冻，能量满时常态和冷冻都可变双发
   shoot() {
     switch (this.shootType) {
       case ShootType.OneShoot:
@@ -213,9 +231,6 @@ export class player extends Component {
         break;
       case ShootType.TwoShoot:
         this.twoShoot();
-        break;
-      case ShootType.IceShoot:
-        this.iceShoot();
         break;
       case ShootType.None:
         break;
@@ -225,28 +240,28 @@ export class player extends Component {
   oneShoot() {
     let bullet = poolManager
       .instance()
-      .getNode(this.bullet1Prefab, this.bulletParent);
+      .getNode(this.bulletPrefab[this.bulletType], this.bulletParent);
     bullet.setWorldPosition(this.position0.worldPosition);
   }
 
   twoShoot() {
     let bullet1 = poolManager
       .instance()
-      .getNode(this.bullet1Prefab, this.bulletParent);
+      .getNode(this.bulletPrefab[this.bulletType], this.bulletParent);
     bullet1.setWorldPosition(this.position1.worldPosition);
 
     let bullet2 = poolManager
       .instance()
-      .getNode(this.bullet1Prefab, this.bulletParent);
+      .getNode(this.bulletPrefab[this.bulletType], this.bulletParent);
     bullet2.setWorldPosition(this.position2.worldPosition);
   }
 
-  iceShoot() {
-    let bullet = poolManager
-      .instance()
-      .getNode(this.bullet2Prefab, this.bulletParent);
-    bullet.setWorldPosition(this.position0.worldPosition);
-  }
+  // iceShoot() {
+  //   let bullet = poolManager
+  //     .instance()
+  //     .getNode(this.bulletPrefab[this.bulletType], this.bulletParent);
+  //   bullet.setWorldPosition(this.position0.worldPosition);
+  // }
 
   contactReward(otherCollider: Collider2D) {
     // console.log("contact reward");
@@ -264,7 +279,10 @@ export class player extends Component {
   collidingIce() {
     if (this.isCollidingIce) return;
     this.isCollidingIce = true;
-    this.switchShootType(ShootType.IceShoot);
+
+    this.switchBulletType(BulletType.Ice);
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.GET_ICE_BULLET);
+
     this.scheduleOnce(() => {
       this.isCollidingIce = false;
     }, 0);
@@ -273,7 +291,10 @@ export class player extends Component {
   collidingBomb() {
     if (this.isCollidingBomb) return;
     this.isCollidingBomb = true;
+
     game.emit(GameEvents.GET_BOMB);
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.GET_BOMB);
+
     this.scheduleOnce(() => {
       this.isCollidingBomb = false;
     }, 0);
@@ -293,12 +314,30 @@ export class player extends Component {
       // console.log("switch one shoot type");
       this.resetShootTypeTimer = null;
     };
-    this.scheduleOnce(this.resetShootTypeTimer, 5);
+
+    this.scheduleOnce(this.resetShootTypeTimer, 10);
+  }
+
+  switchBulletType(bulletType: BulletType) {
+    // console.log("switch shoot type to " + shootType);
+    this.bulletType = bulletType;
+
+    if (this.resetBulletTypeTimer !== null) {
+      // console.log("unschedule");
+      this.unschedule(this.resetBulletTypeTimer);
+    }
+
+    this.resetBulletTypeTimer = () => {
+      this.bulletType = BulletType.Normal;
+      this.resetBulletTypeTimer = null;
+    };
+
+    this.scheduleOnce(this.resetBulletTypeTimer, 5);
   }
 
   contactEnemy() {
     // console.log("contact enemy");
-    if(this.isCollidingEnemy) return;
+    if (this.isCollidingEnemy) return;
     this.isCollidingEnemy = true;
 
     this.currentLifePoint--;
@@ -325,6 +364,8 @@ export class player extends Component {
   }
 
   die() {
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.PLAYER_DIE);
+    
     if (this.collider) {
       this.collider.enabled = false;
     }

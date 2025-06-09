@@ -8,16 +8,20 @@ import {
   Node,
 } from "cc";
 import { player } from "./player";
+import { enemy } from './enemy';
+import { AudioTypes } from "./audioManager";
 const { ccclass, property } = _decorator;
 
 export const GameEvents = {
   GET_BOMB: "Get Bomb",
+  USE_BOMB: "Use Bomb",
   LIFE_CHANGE: "Life Change",
   SCORE_ADD: "Score Add",
   PLAYER_ENABLE: "Player Enable",
   PLAYER_DISABLE: "Player Disable",
   GAME_OVER: "Game Over",
   ENERGY_ADD: "Energy Add",
+  AUDIO_PLAY: "Audio Play",
 } as const;
 
 @ccclass("gameManager")
@@ -56,9 +60,11 @@ export class gameManager extends Component {
   // quitButton: Node = null;
   @property({ type: Node, displayName: "游戏结束界面" })
   gameOverUI: Node = null;
+  @property({ type: Node, displayName: "物体管理器" })
+  objectManager: Node = null;
 
-  bombCount: number = 0;
-  score: number = 0;
+  bombCount: number = 0; // 炸弹数量
+  score: number = 0; // 当前分数
 
   protected onLoad(): void {
     if (gameManager._instance) {
@@ -66,8 +72,9 @@ export class gameManager extends Component {
       return;
     }
     gameManager._instance = this;
-    // console.log("listening for Get Bomb event");
+
     game.on(GameEvents.GET_BOMB, this.getBomb, this);
+    game.on(GameEvents.USE_BOMB, this.useBomb, this);
     game.on(
       GameEvents.LIFE_CHANGE,
       //@ts-ignore
@@ -94,6 +101,7 @@ export class gameManager extends Component {
       gameManager._instance = null;
     }
     game.off(GameEvents.GET_BOMB, this.getBomb, this);
+    game.off(GameEvents.USE_BOMB, this.useBomb, this);
     game.off(
       GameEvents.LIFE_CHANGE,
       (currentLifePoint: number) => {
@@ -134,10 +142,11 @@ export class gameManager extends Component {
       this.scoreLabel.string = this.score.toString();
     }
   }
-  
-  //TODO:游戏结束后暂停时间会让按钮不显示动画效果
+
   gameOver() {
-    this.onPauseButtonClick();
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.GAME_OVER);
+
+    this.scheduleOnce(this.pause,1);
 
     if (this.gameOverUI) {
       this.gameOverUI.active = true;
@@ -150,7 +159,6 @@ export class gameManager extends Component {
     this.updateBestScore();
   }
 
-  //TODO: 新记录提示
   updateBestScore() {
     let bestScore = localStorage.getItem("bestScore");
     if (!bestScore) {
@@ -167,9 +175,19 @@ export class gameManager extends Component {
     }
   }
 
-  onPauseButtonClick() {
+  pause(){
     director.pause();
     game.emit(GameEvents.PLAYER_DISABLE);
+  }
+
+  resume(){
+    director.resume();
+    game.emit(GameEvents.PLAYER_ENABLE);
+  }
+
+  onPauseButtonClick() {
+    this.pause();
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.PRESS_BUTTON);
     if (this.pauseButton) {
       this.pauseButton.active = false;
     }
@@ -179,8 +197,8 @@ export class gameManager extends Component {
   }
 
   onResumeButtonClick() {
-    director.resume();
-    game.emit(GameEvents.PLAYER_ENABLE);
+    this.resume();
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.PRESS_BUTTON);
     if (this.pauseButton) {
       this.pauseButton.active = true;
     }
@@ -191,12 +209,40 @@ export class gameManager extends Component {
 
   onRestartButtonClick() {
     this.onResumeButtonClick();
-    this.scheduleOnce(() => {
-      director.loadScene(director.getScene().name);
-    }, 0.5);
+    director.loadScene(director.getScene().name);
   }
 
   onQuitButtonClick() {
-    director.end();
+    this.onResumeButtonClick();
+    director.loadScene("start");
   }
+
+  useBomb() {
+    // console.log("useBomb");
+    if (this.bombCount > 0) {
+      game.emit(GameEvents.AUDIO_PLAY,AudioTypes.USE_BOMB);
+
+      this.bombCount--;
+      if (this.bombLabel) {
+        this.bombLabel.string = this.bombCount.toString();
+      }
+
+      this.clearEnemy();
+    }
+  }
+
+  clearEnemy(){
+    // console.log("clear enemy");
+    if (!this.objectManager) {
+      console.error("objectManager is not set");
+      return;
+    }
+    for(let i = 0; i < this.objectManager.children.length; i++) {
+      const childEnemy = this.objectManager.children[i].getComponent(enemy);
+      if(childEnemy && childEnemy.currentLifePoint > 0) {
+        childEnemy.die();
+      }
+    }
+  }
+
 }

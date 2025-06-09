@@ -17,6 +17,7 @@ import { poolManager } from "./poolManager";
 import { CollisionGroup, player } from "./player";
 import { bullet, BulletType } from "./bullet";
 import { GameEvents, gameManager } from "./gameManager";
+import { AudioTypes } from "./audioManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("enemy")
@@ -91,6 +92,7 @@ export class enemy extends Component {
     // console.log("die");
     game.emit(GameEvents.SCORE_ADD, this.score);
     game.emit(GameEvents.ENERGY_ADD, this.energy);
+    game.emit(GameEvents.AUDIO_PLAY,AudioTypes.ENEMY_DIE);
     if (this.collider) {
       this.collider.enabled = false;
     }

@@ -20,13 +20,16 @@
         "__id__": 2
       },
       {
+        "__id__": 108
+      },
+      {
         "__id__": 40
       }
     ],
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 107
+      "__id__": 120
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -57,7 +60,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 108
+      "__id__": 121
     },
     "_id": "4235c1a4-03a9-4f44-9bf0-30ebb0c6b27a"
   },
@@ -92,13 +95,13 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 104
-      },
-      {
         "__id__": 105
       },
       {
         "__id__": 106
+      },
+      {
+        "__id__": 107
       }
     ],
     "_prefab": null,
@@ -972,14 +975,16 @@
     "_enabled": true,
     "__prefab": null,
     "shootRate": 0.15,
-    "bullet1Prefab": {
-      "__uuid__": "3f41b41d-b614-4c53-84ae-1c345e520cd4",
-      "__expectedType__": "cc.Prefab"
-    },
-    "bullet2Prefab": {
-      "__uuid__": "60b98f90-adc2-4b16-a68e-4853b927f618",
-      "__expectedType__": "cc.Prefab"
-    },
+    "bulletPrefab": [
+      {
+        "__uuid__": "3f41b41d-b614-4c53-84ae-1c345e520cd4",
+        "__expectedType__": "cc.Prefab"
+      },
+      {
+        "__uuid__": "60b98f90-adc2-4b16-a68e-4853b927f618",
+        "__expectedType__": "cc.Prefab"
+      }
+    ],
     "bulletParent": {
       "__id__": 26
     },
@@ -992,7 +997,6 @@
     "position2": {
       "__id__": 23
     },
-    "shootType": 0,
     "lifePoint": 2,
     "animation": {
       "__id__": 20
@@ -1324,6 +1328,9 @@
       },
       {
         "__id__": 36
+      },
+      {
+        "__id__": 104
       }
     ],
     "_prefab": null,
@@ -1414,6 +1421,9 @@
     },
     "gameOverUI": {
       "__id__": 69
+    },
+    "objectManager": {
+      "__id__": 30
     },
     "_id": "d4kKhlpyJAt6OketCXFHhi"
   },
@@ -4056,6 +4066,25 @@
     "_id": "4eZbxw4AdGMbSsmHPX55o6"
   },
   {
+    "__type__": "cc.AudioSource",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 34
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_clip": {
+      "__uuid__": "98f371ff-396a-4343-b4d9-017e299ff4d5",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "_loop": true,
+    "_playOnAwake": true,
+    "_volume": 0.1,
+    "_id": "67oM+C2aNC3p9WTwUjGfKT"
+  },
+  {
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
@@ -4124,6 +4153,166 @@
     "_id": "c5V1EV8IpMtrIvY1OE9t2u"
   },
   {
+    "__type__": "cc.Node",
+    "_name": "audioManager",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 109
+      },
+      {
+        "__id__": 110
+      }
+    ],
+    "_prefab": null,
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 240,
+      "y": 425,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_mobility": 0,
+    "_layer": 1,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": "20OPtt96xC35JPFBqPUNcY"
+  },
+  {
+    "__type__": "cc.UITransform",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 108
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 100,
+      "height": 100
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "_id": "37z45gwSVKjZ4VCQjKhwj7"
+  },
+  {
+    "__type__": "8ad63Y5a9JDloNBnNyeOQIg",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 108
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "audioData": [
+      {
+        "__id__": 111
+      },
+      {
+        "__id__": 112
+      },
+      {
+        "__id__": 113
+      },
+      {
+        "__id__": 114
+      },
+      {
+        "__id__": 115
+      },
+      {
+        "__id__": 116
+      },
+      {
+        "__id__": 117
+      },
+      {
+        "__id__": 118
+      },
+      {
+        "__id__": 119
+      }
+    ],
+    "_id": "bfBYk4ErJMfJEeVyuOY16T"
+  },
+  {
+    "__type__": "AudioData",
+    "audioType": "enemy0 die",
+    "audioClip": {
+      "__uuid__": "351b2a4a-10ea-458b-b529-b325282a5a01",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
+    "__type__": "AudioData",
+    "audioClip": null,
+    "audioSource": null
+  },
+  {
     "__type__": "cc.PrefabInfo",
     "root": null,
     "asset": null,
@@ -4134,28 +4323,28 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 109
+      "__id__": 122
     },
     "shadows": {
-      "__id__": 110
+      "__id__": 123
     },
     "_skybox": {
-      "__id__": 111
+      "__id__": 124
     },
     "fog": {
-      "__id__": 112
+      "__id__": 125
     },
     "octree": {
-      "__id__": 113
+      "__id__": 126
     },
     "skin": {
-      "__id__": 114
+      "__id__": 127
     },
     "lightProbeInfo": {
-      "__id__": 115
+      "__id__": 128
     },
     "postSettings": {
-      "__id__": 116
+      "__id__": 129
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false
