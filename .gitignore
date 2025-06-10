@@ -1,28 +1,83 @@
 
-#///////////////////////////
-# Cocos Creator 3D Project
-#///////////////////////////
-library/
-temp/
-local/
-build/
-# profiles/
-native
-#//////////////////////////
-# NPM
-#//////////////////////////
+# #///////////////////////////
+# # Cocos Creator 3D Project
+# #///////////////////////////
+# library/
+# temp/
+# local/
+# build/
+# # profiles/
+# native
+# #//////////////////////////
+# # NPM
+# #//////////////////////////
+# node_modules/
+
+# #//////////////////////////
+# # VSCode
+# #//////////////////////////
+# .vscode/
+
+# #//////////////////////////
+# # WebStorm
+# #//////////////////////////
+# .idea/
+
+# **/*.meta
+# .vs/
+# .creator/
+
+#/
+# Fireball Projects
+#/
+
+/library/
+/temp/
+local/*
+!local/local.json
+/build/
+
+#/
+# npm files
+#/
+
+npm-debug.log
 node_modules/
 
-#//////////////////////////
-# VSCode
-#//////////////////////////
-.vscode/
+#/
+# Logs and databases
+#/
 
-#//////////////////////////
-# WebStorm
-#//////////////////////////
+*.log
+*.sql
+*.sqlite
+
+#/
+# files for debugger
+#/
+
+*.sln
+*.csproj
+*.pidb
+*.unityproj
+*.suo
+
+#/
+# OS generated files
+#/
+
+.DS_Store
+ehthumbs.db
+Thumbs.db
+
+#/
+# WebStorm files
+#/
+
 .idea/
 
-**/*.meta
-.vs/
-.creator/
+#//
+# VS Code files
+#//
+
+.vscode/
